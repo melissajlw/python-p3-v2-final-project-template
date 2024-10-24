@@ -23,7 +23,7 @@ def solve(board):
     empty_cell = find_empty(board)
     # Board is solved
     if not empty_cell:
-        return True
+        return board
         
     row, col = empty_cell
 
@@ -34,7 +34,7 @@ def solve(board):
         if is_valid(board, row, col, num):
             board[row][col] = num
             if solve(board):
-                return True
+                return board
             # Backtrack if current placement doesn't lead to a solution
             board[row][col] = 0
         # No valid number for current empty cell
@@ -60,9 +60,46 @@ def generate_unsolved(difficulty, board):
     elif difficulty == "hard":
         num = 3
     
-    for n in range(num):
+    for _ in range(num):
         # Randomize the blank spaces n times based on difficulty
         empty_cells = random.sample([(i, j) for i in range (9) for j in range(9)], 40)
         for cell in empty_cells:
             board[cell[0]][cell[1]] = 0
     return board
+
+# slices string into chunks of size n
+def slice_string(string, n):
+    return [string[i:i+n] for i in range(0, len(string), n)]
+
+def string_to_board(board_string):
+    # slices string into chunks of size 9
+    board = slice_string(board_string, 9)
+
+    # slices the string into individual characters
+    res = list(map(lambda ele: list(ele), board))
+
+    # changes the string to numeric
+    for i in range(9):
+        for j in range(9):
+            res[i][j] = int(res[i][j])
+
+    return res
+
+def board_to_string(board):
+    tmp_str = ""
+    for i in range(9):
+        for j in range(9):
+            tmp_str = tmp_str + str(board[i][j])
+    return tmp_str
+
+# test_string = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
+# board = string_to_board(test_string)
+# print(board)
+# test_string_2 = board_to_string(board)
+# print(test_string_2)
+# print(test_string.isnumeric())
+
+# test_board = generate_solved()
+# print(test_board)
+# test_string = board_to_string(test_board)
+# print(test_string)
