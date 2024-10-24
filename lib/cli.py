@@ -82,7 +82,7 @@ class Cli():
         user_input = input("Enter here: ")
         if user_input == "1":
             clear()
-            print("easy sudoku")
+            print("Easy Sudoku")
             print("----------")
             space()
             solved_board = helpers.generate_solved()
@@ -96,11 +96,23 @@ class Cli():
             print("Medium Sudoku")
             print("----------")
             space()
-            Sudoku.create(board="")
+            solved_board = helpers.generate_solved()
+            board = helpers.generate_unsolved("medium", solved_board)
+            sudoku = Sudoku.create(board=board, difficulty="medium")
+            sudoku.link_player(player)
+            clear()
+            print("Created medium Sudoku successfully")
         elif user_input == "3":
             clear()
             print("Hard Sudoku")
             print("----------")
+            space()
+            solved_board = helpers.generate_solved()
+            board = helpers.generate_unsolved("hard", solved_board)
+            sudoku = Sudoku.create(board=board, difficulty="hard")
+            sudoku.link_player(player)
+            clear()
+            print("Created hard Sudoku successfully")
         else:
             clear()
             invalid_choice()
@@ -211,7 +223,8 @@ class Cli():
     
     def sudoku_menu(self, sudoku):
         print("Type '1' to solve the sudoku")
-        print("Type '2' to delete the sudoku")
+        print("Type '2' to edit the sudoku")
+        print("Type '3' to delete the sudoku")
         print("Type exit to exit to the main menu")
         self.sudoku_menu_choice(sudoku)
 
@@ -223,6 +236,10 @@ class Cli():
             sudoku.display()
         elif user_input == "2":
             clear()
+            self.edit_sudoku(sudoku)
+            self.restart_sudoku_details(sudoku)
+        elif user_input == "3":
+            clear()
             if not self.delete_sudoku(sudoku):
                 self.restart_sudoku_details(sudoku)
         elif user_input == "exit":
@@ -230,6 +247,23 @@ class Cli():
         else:
             clear()
             invalid_choice()
+    
+    def edit_sudoku(self, sudoku):
+        print(f"Edit Sudoku")
+        sudoku.display()
+        print("----------")
+        space()
+        self.edit_sudoku_selection(sudoku)
+    
+    def edit_sudoku_selection(self, sudoku):
+        user_input = input("Do you want to update the Sudoku? (y/n): ")
+        if user_input.lower() == "y":
+            clear()
+            print("Edit the string to update the Sudoku board")
+            print(f"{sudoku.board}")
+            board = input("Enter board string here: ")
+            sudoku.board = board
+            sudoku.save()
 
     def edit_player(self, player):
         print(f"Edit {player.name}")
