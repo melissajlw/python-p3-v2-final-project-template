@@ -2,34 +2,40 @@ import helpers
 from __init__ import CONN, CURSOR
 
 class Sudoku():
-    # Sudoku board generated defaults to easy mode
+    # Initialize a Sudoku object with optional board, difficulty, player_id, and id
     def __init__(self, board="", difficulty="easy", player_id=None, id=None):
+        # If the board is not provided or invalid, generate a new one
         if board == "NULL" or board == "" or not isinstance(board, str):
+            # Generate a solved Sudoku board
             sudoku_solution = helpers.generate_solved()
+            # Generate an unsolved Sudoku board based on the difficulty
             sudoku_board = helpers.generate_unsolved(difficulty, sudoku_solution)
         else:
+            # Convert the provided board string to a 2D list
             sudoku_board = helpers.string_to_board(board)
-            # print(f"This is the sudoku board {sudoku_board}")
-            # print(f"This is the sudoku solution {sudoku_solution}")
-
+        
+        # Convert the board to a string and set the attributes
         self.board = helpers.board_to_string(sudoku_board)
         self.difficulty = difficulty
-        # self.completed = False
         self.player_id = player_id
         self.id = id
 
     @property
     def board(self):
+        # Getter for the board attribute
         return self._board
     
     @board.setter
     def board(self, board):
+        # Setter for the board attribute with validation
         if not isinstance(board, str) or not len(board) == 81 or not board.isnumeric():
             raise ValueError
         self._board = board
     
     def display(self):
+        # Convert the board string to a 2D list
         board = helpers.string_to_board(self.board)
+        # Display the board in a formatted way
         for row in range(len(board)):
             if row % 3 == 0 and row != 0:
                 print("- - - - - - - - - - -")
@@ -54,6 +60,7 @@ class Sudoku():
 
     @classmethod
     def create_table(cls):
+        # Create the sudokus table if it doesn't exist
         sql = """
             CREATE TABLE IF NOT EXISTS sudokus (
             id INTEGER PRIMARY KEY,
@@ -67,20 +74,23 @@ class Sudoku():
     
     @classmethod
     def drop_table(cls):
+        # Drop the sudokus table if it exists
         sql = '''
-            DROP TABLE sudokus;
+            DROP TABLE IF EXISTS sudokus;
         '''
 
         CURSOR.execute(sql)  
 
     @classmethod
     def create(cls, board="", difficulty="easy", player_id=None):
+        # Create a new Sudoku object and save it to the database
         sudoku = Sudoku(board=board, difficulty=difficulty, player_id=player_id)
         sudoku.save()
         return sudoku
     
     @classmethod
     def find_by_id(cls, id):
+        # Find a Sudoku puzzle by id
         sql='''
             SELECT * FROM sudokus
             WHERE id = ?;
@@ -92,6 +102,7 @@ class Sudoku():
     
     @classmethod
     def all(cls):
+        # Retrieve all Sudoku puzzles from the database
         sql = '''
             SELECT * FROM sudokus;
         '''
@@ -110,19 +121,24 @@ class Sudoku():
             sudoku.delete()
 
     def save(self):
+        # Save the Sudoku puzzle to the database
         if not self.id:
+            # Insert a new Sudoku record
             sql = '''
                 INSERT INTO sudokus (board, difficulty, player_id) VALUES (?, ?, ?)
             '''
 
             CURSOR.execute(sql, (self.board, self.difficulty, self.player_id))
+            # Get the id of the newly inserted Sudoku
             CONN.commit()
+            # Commit the transaction to the database
             sql = '''
                 SELECT id FROM sudokus ORDER BY id DESC LIMIT 1
             '''
             self.id = CURSOR.execute(sql).fetchall()[0][0]
 
         else:
+            # Update the existing Sudoku record
             sql = '''
                 UPDATE sudokus SET board = ?, difficulty = ?, player_id = ?
                 WHERE id = ?
@@ -132,11 +148,13 @@ class Sudoku():
             CONN.commit()
 
     def delete(self):
+        # Delete the Sudoku puzzle from the database
         sql = "DELETE FROM sudokus WHERE id = ?"
         CURSOR.execute(sql, (self.id,))
         CONN.commit()
     
     def unlink(self):
+        # Unlink the player from the Sudoku puzzle
         sql = '''
             UPDATE sudokus SET player_id = NULL WHERE id = ?
         '''
@@ -145,15 +163,18 @@ class Sudoku():
         CONN.commit()
     
     def link_player(self, player):
+        # Link a player to the Sudoku puzzle
         self.player_id = player.id
         self.save()
     
     def solve(self):
+        # Solve the Sudoku puzzle
         solution = helpers.solve(helpers.string_to_board(self.board))
         solution_string = helpers.board_to_string(solution)
         self.board = solution_string
     
     def __repr__(self):
+        # String representation of the Sudoku object
         return f'<Sudoku id={self.id} board="{self.board}" difficulty="{self.difficulty}" player_id={self.player_id}>'
 
 

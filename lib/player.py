@@ -5,6 +5,7 @@ import ipdb
 class Player():
 
     def __init__(self, name, id=None):
+        # Initialize the Player object with name, score, and optional id
         self.name = name
         self.id = id
 
@@ -33,6 +34,7 @@ class Player():
         return [Sudoku.create_by_row(row) for row in rows]
 
     @classmethod
+    # Create the players table if it doesn't exist
     def create_table(cls):
         sql = '''
             CREATE TABLE IF NOT EXISTS players (
@@ -45,6 +47,7 @@ class Player():
 
     @classmethod
     def drop_table(cls):
+        # Drop the players table if it exists
         sql = '''
             DROP TABLE players;
         '''
@@ -53,12 +56,14 @@ class Player():
 
     @classmethod
     def create(cls, name):
+        # Create a new player and save it to the database
         player = Player(name=name)
         player.save()
         return player
   
     @classmethod
     def find_by_id(cls, id):
+        # Find a player by id
         sql='''
             SELECT * FROM players
             WHERE id = ?;
@@ -70,6 +75,7 @@ class Player():
   
     @classmethod
     def all(cls):
+        # Retrieve all players from the database
         sql = '''
             SELECT * FROM players;
         '''
@@ -88,7 +94,9 @@ class Player():
             player.delete()
 
     def save(self):
+        # Save the player to the database
         if not self.id:
+            # Update the existing player record
             sql = '''
                 INSERT INTO players (name) VALUES (?)
             '''
@@ -102,15 +110,19 @@ class Player():
             self.id = CURSOR.execute(sql).fetchall()[0][0]
 
         else:
+            # Insert a new player record
             sql = '''
                 UPDATE players SET name = ?
                 WHERE id = ?
             '''
 
             CURSOR.execute(sql, (self.name, self.id))
+            # Get the id of the newly inserted player
             CONN.commit()
+            # Commit the transaction to the database
 
     def delete(self):
+        # Delete the player from the database
         sql = "DELETE FROM players WHERE id = ?"
         CURSOR.execute(sql, (self.id,))
         CONN.commit()

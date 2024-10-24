@@ -7,39 +7,47 @@ from player import Player
 
 class Cli():
     def start(self):
+        # Clear the screen and start the main menu
         clear()
         print("Let's play Sudoku!")
         self.main_menu()
     
     # MENU METHODS
     def restart_main_menu(self):
+         # Wait for any key press, clear the screen, and restart the main menu
         any_key_to_continue()
         clear()
         self.main_menu()
     
     def restart_player_details(self, player):
+        # Wait for any key press, clear the screen, and restart the player details menu
         any_key_to_continue()
         clear()
         self.print_player_details(player)
         self.player_details_menu(player)
     
     def restart_difficulty_menu(self):
+        # Wait for any key press, clear the screen, and restart the difficulty menu
         any_key_to_continue()
         clear()
         self.difficulty_menu()
     
     def restart_sudoku_details(self, sudoku):
+        # Wait for any key press, clear the screen, and restart the Sudoku details menu
+        any_key_to_continue()
         any_key_to_continue()
         clear()
         self.sudoku_menu(sudoku)
 
     def main_menu(self):
+        # Display the main menu options
         space()
         print("Enter 1 to see a list of previous players")
         print("Enter 2 to create a new player")
         print("Enter 3 to select a player")
         print("Enter 4 to see all Sudokus")
         print("Type exit to exit the program")
+        # Handle the user's menu selection
         self.main_menu_selection()
     
     def main_menu_selection(self):
